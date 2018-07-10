@@ -1,7 +1,7 @@
 {
   "name": "rubik-mail",
   "version": "1.0.0",
-  "description": "Simple SMTP mailer for the Rubik",
+  "description": "Simple mailer for the Rubik",
   "main": "Mail.js",
   "repository": "https://github.com/ya-kostik/rubik-mail",
   "author": "Constantin Tsukanov <c@indotech.ru>",
@@ -16,7 +16,8 @@
     "smtp",
     "rubik",
     "kubik",
-    "mail"
+    "mail",
+    "mailer"
   ],
   "devDependencies": {
     "babel-eslint": "^8.2.3",
