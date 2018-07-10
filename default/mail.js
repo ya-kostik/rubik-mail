@@ -8,5 +8,11 @@ module.exports = {
       user: 'user',
       pass: 'password'
     }
-  }
+  },
+  // Will be used, if no from in in Message's object
+  from: '',
+  // Will be used if no to in in Message's object
+  to: '',
+  // Will be used if no subject in Message's object
+  subject: ''
 };

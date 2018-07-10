@@ -1,7 +1,5 @@
 const Rubik = require('rubik-main');
 
-const nodemailer = require('nodemailer');
-
 /**
  * Address of email
  * All email addresses can be plain email addresses 'foobar@example.com'
@@ -27,7 +25,7 @@ const nodemailer = require('nodemailer');
  * @prop {(EmailAddress|Array<EmailAddress>)} bcc - Comma separated list or an array of recipients email addresses that will appear on the Bcc: field
  * @prop {String} subject - The subject of the email
  * @prop {(String|Buffer|Stream|EmailAttachment)} text - The plaintext version of the message as an Unicode string, Buffer, Stream or an attachment-like object ({path: ‘/var/data/…’})
- * @prop {((String|Buffer|Stream|EmailAttachment))} html - The HTML version of the message as an Unicode string, Buffer, Stream or an attachment-like object ({path: ‘http://…‘})
+ * @prop {(String|Buffer|Stream|EmailAttachment)} html - The HTML version of the message as an Unicode string, Buffer, Stream or an attachment-like object ({path: ‘http://…‘})
  * @prop {Array<EmailAttachment>} attachments - An array of attachment objects. Attachments can be used for embedding images as well.
  * @see https://nodemailer.com/message/
  */
@@ -44,22 +42,49 @@ const nodemailer = require('nodemailer');
 class Mail extends Rubik.Kubik {
   async up(dependencies) {
     Object.assign(this, dependencies);
-    this.options = this.config.get('smtp');
+    this.options = this.config.get(this.name);
     await this.applyHooks('before');
-    this.transporter = nodemailer.createTransport(this.options);
+    this.initTransport();
+
+  }
+
+  initTransport() {
+    if (this.options.type === 'smtp') return this.initSMTP();
+    this._throwInvalidType();
+  }
+
+  initSMTP() {
+    // To avoid storing RAM, if another transport is selected
+    const nodemailer = require('nodemailer');
+    this.smtp = nodemailer.createTransport(this.options.smtp);
+  }
+
+  _throwInvalidType() {
+    throw new TypeError('Mail type is invalid. Possible types: smtp');
   }
 
   async after() {
     await this.applyHooks('after');
   }
 
+  _checkMessage(message) {
+    if (!message.from) message.from = this.options.from;
+    if (!message.to) message.to = this.options.to;
+    if (!message.subject) message.subject = this.options.subject;
+    if (!(message.from && message.to && (message.text || message.html))) {
+      throw new TypeError('message is invalid');
+    }
+  }
+
   /**
-   * send method
-   * @param  {EmailMessage} message [description]
-   * @return {[type]}         [description]
+   * send mail
+   * @param  {EmailMessage} message message to send
+   * @return {Promise}
    */
   send(message) {
-    return this.transporter.sendMail(message);
+    this._checkMessage(message);
+    if (this.options.type === 'smtp') return this.smtp.sendMail(message);
+    this._throwInvalidType();
   }
 }
 
