@@ -52,3 +52,17 @@ test('Send mail via SMTP' + description, async () => {
   promisses.push(app.get('mail').send({ to: addTo, text: 'This is test' }));
   await Promise.all(promisses);
 });
+
+test('Send mail via log — check your console', async () => {
+  const app = init();
+  app.get('config').get('mail').type = 'log';
+  createKubik(Mail, app);
+  await app.up();
+  app.log.info('Here is a message:')
+  await app.get('mail').send({
+    from: 'mail@example.com',
+    to: 'anothermail@example.com',
+    subject: 'Tasty test',
+    text: 'This is test'
+  });
+});

@@ -65,3 +65,9 @@ module.exports = {
   subject: ''
 };
 ```
+
+## Test log-mode
+
+If you doesn't want to send messages, just test it (for example when you develop your application), you can set a `type` field in a `mail.js` config file to `log` (or `mail_type=log` in the environment vars).
+
+Now `mail` kubik will use `log.dir` method from your `log` kubik of application.

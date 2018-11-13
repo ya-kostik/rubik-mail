@@ -50,6 +50,7 @@ class Mail extends Rubik.Kubik {
 
   initTransport() {
     if (this.options.type === 'smtp') return this.initSMTP();
+    if (this.options.type === 'log') return;
     this._throwInvalidType();
   }
 
@@ -60,7 +61,7 @@ class Mail extends Rubik.Kubik {
   }
 
   _throwInvalidType() {
-    throw new TypeError('Mail type is invalid. Possible types: smtp');
+    throw new TypeError('Mail type is invalid. Possible types: smtp, log');
   }
 
   async after() {
@@ -84,6 +85,9 @@ class Mail extends Rubik.Kubik {
   send(message) {
     this._checkMessage(message);
     if (this.options.type === 'smtp') return this.smtp.sendMail(message);
+    if (this.options.type === 'log') {
+      return this.log.dir(message, { colors: true, depth: 10 });
+    }
     this._throwInvalidType();
   }
 }
