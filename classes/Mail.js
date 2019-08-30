@@ -1,4 +1,5 @@
 const Rubik = require('rubik-main');
+const path = require('path');
 
 /**
  * Address of email
@@ -40,24 +41,28 @@ const Rubik = require('rubik-main');
  * @prop {Array<String>} dependencies ['log', 'config']
  */
 class Mail extends Rubik.Kubik {
+  /**
+   * Up kubik
+   * @param  {Object} dependencies
+   */
   async up(dependencies) {
     Object.assign(this, dependencies);
     this.options = this.config.get(this.name);
     await this.applyHooks('before');
-    this.initTransport();
-
+    await this.initTransport();
   }
 
-  initTransport() {
-    if (this.options.type === 'smtp') return this.initSMTP();
-    if (this.options.type === 'log') return;
-    this._throwInvalidType();
-  }
+  async initTransport() {
+    const name = this.providers[this.options.type];
+    if (!name) return this._throwInvalidType();
 
-  initSMTP() {
-    // To avoid storing RAM, if another transport is selected
-    const nodemailer = require('nodemailer');
-    this.smtp = nodemailer.createTransport(this.options.smtp);
+    const Provider = require(path.join(__dirname, './Providers/' + name));
+    if (!Provider) return this._throwInvalidType();
+
+    const config = this.options[this.options.type] || {};
+
+    this.provider = new Provider(config, this, this.options);
+    await this.provider.init();
   }
 
   _throwInvalidType() {
@@ -68,31 +73,23 @@ class Mail extends Rubik.Kubik {
     await this.applyHooks('after');
   }
 
-  _checkMessage(message) {
-    if (!message.from) message.from = this.options.from;
-    if (!message.to) message.to = this.options.to;
-    if (!message.subject) message.subject = this.options.subject;
-    if (!(message.from && message.to && (message.text || message.html))) {
-      throw new TypeError('message is invalid');
-    }
-  }
-
   /**
    * send mail
    * @param  {EmailMessage} message message to send
    * @return {Promise}
    */
   send(message) {
-    this._checkMessage(message);
-    if (this.options.type === 'smtp') return this.smtp.sendMail(message);
-    if (this.options.type === 'log') {
-      return this.log.dir(message, { colors: true, depth: 10 });
-    }
-    this._throwInvalidType();
+    this.provider.checkMessage(message);
+    return this.provider.send(message);
   }
 }
 
 Mail.prototype.name = 'mail';
 Mail.prototype.dependencies = Object.freeze(['log', 'config']);
+Mail.prototype.providers = Object.freeze({
+  mandrill: 'Mandrill',
+  smtp: 'SMTP',
+  log: 'Log'
+});
 
 module.exports = Mail;

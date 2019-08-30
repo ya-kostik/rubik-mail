@@ -5,9 +5,13 @@ module.exports = {
     port: 465,
     secure: true,
     auth: {
-      user: 'user',
-      pass: 'password'
+      user: '',
+      pass: ''
     }
+  },
+  mandrill: {
+    token: '',
+    debug: false
   },
   // Will be used, if no from in in Message's object
   from: '',

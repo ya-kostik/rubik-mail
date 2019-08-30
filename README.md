@@ -1,7 +1,7 @@
 # rubik-mail
 Simple mailer for the Rubik
 
-## Install
+# Install
 Via NPM
 ```sh
 npm install rubik-mail
@@ -12,7 +12,11 @@ Via Yarn
 yarn add rubik-mail
 ```
 
-## Usage
+## Install additional modules for channels
+- `nodemailer` for the SMTP;
+- `mandrill-api` for the Mandrill
+
+# Usage
 
 ```javascript
 const path = require('path');
@@ -38,7 +42,7 @@ bootstrap().
 catch(err => console.error('bootstrap error!', err));
 ```
 
-## Configuration
+# Configuration
 
 All configs for a kubik will be loaded by it's name (default is `mail`)
 
@@ -46,7 +50,7 @@ For example config/mail.js
 ```javascript
 module.exports = {
   // smtp only supported at the moment
-  // mandrill, mailgun and others soon
+  // mailgun and others soon
   type: 'smtp',
   smtp: {
     host: 'smtp.exaple.com',
@@ -57,6 +61,10 @@ module.exports = {
       pass: 'password'
     }
   },
+  mandrill: {
+    token: 'token',
+    debug: false
+  },
   // Will be used, if no from in in Message's object
   from: '',
   // Will be used if no to in in Message's object
@@ -65,6 +73,8 @@ module.exports = {
   subject: ''
 };
 ```
+
+*Mandrill channel doesn't support attachments for now, PR are welcome*
 
 ## Test log-mode
 

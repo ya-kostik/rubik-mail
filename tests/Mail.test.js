@@ -2,12 +2,12 @@
 const path = require('path');
 const { createKubik, createApp } = require('rubik-main/tests/helpers/creators');
 const { Kubiks } = require('rubik-main');
-const Mail = require('./Mail');
+const Mail = require('../classes/Mail');
 
 function init() {
   const app = createApp();
-  const config = new Kubiks.Config(path.join(__dirname, './default/'));
-  config.volumes.push(path.join(__dirname, './config/'));
+  const config = new Kubiks.Config(path.join(__dirname, '../default/'));
+  config.volumes.push(path.join(__dirname, '../config/'));
   app.add(config);
   createKubik(Kubiks.Log, app);
   return app;
@@ -30,7 +30,7 @@ test('Create SMTP type', async () => {
   app.get('config').get('mail').type = 'smtp';
   const mail = createKubik(Mail, app);
   await app.up();
-  expect(mail.smtp).toBeDefined();
+  expect(mail.provider).toBeDefined();
 });
 
 const description = '(you should set config and check your mailbox)';
