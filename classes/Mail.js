@@ -52,17 +52,32 @@ class Mail extends Rubik.Kubik {
     await this.initTransport();
   }
 
-  async initTransport() {
-    const name = this.providers[this.options.type];
+  /**
+   * Create mail tranport provider
+   * @param  {String} type    of transport
+   * @param  {Object} config  of transport
+   * @param  {Object} options of Mail
+   * @return {Promise<Provider>}
+   */
+  async createProvider(type, config = {}, options = {}) {
+    const name = this.providers[type];
     if (!name) return this._throwInvalidType();
 
     const Provider = require(path.join(__dirname, './Providers/' + name));
     if (!Provider) return this._throwInvalidType();
 
-    const config = this.options[this.options.type] || {};
+    const provider = new Provider(config, this, options);
+    await provider.init();
 
-    this.provider = new Provider(config, this, this.options);
-    await this.provider.init();
+    return provider;
+  }
+
+  async initTransport() {
+    const type = this.options.type;
+    const config = this.options[type];
+    this.provider = await this.createProvider(
+      type, config, this.options
+    );
   }
 
   _throwInvalidType() {
@@ -78,9 +93,9 @@ class Mail extends Rubik.Kubik {
    * @param  {EmailMessage} message message to send
    * @return {Promise}
    */
-  send(message) {
-    this.provider.checkMessage(message);
-    return this.provider.send(message);
+  send(message, provider = this.provider) {
+    provider.checkMessage(message);
+    return provider.send(message);
   }
 }
 

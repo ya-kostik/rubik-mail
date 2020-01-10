@@ -5,7 +5,7 @@ class Provider {
     this.config = config;
     this.parent = parent;
 
-    this.options = options;
+    this.options = options || {};
   }
 
   init() {}

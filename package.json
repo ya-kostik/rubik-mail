@@ -1,6 +1,6 @@
 {
   "name": "rubik-mail",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Simple mailer for the Rubik",
   "main": "classes/Mail.js",
   "repository": "https://github.com/ya-kostik/rubik-mail",
@@ -22,11 +22,11 @@
   ],
   "devDependencies": {
     "babel-eslint": "^10.0.3",
-    "eslint": "^6.2.2",
+    "eslint": "^6.8.0",
     "jest": "^24.9.0",
     "mandrill-api": "^1.0.45",
-    "nodemailer": "^6.3.0",
-    "rubik-main": "^2.1.2"
+    "nodemailer": "^6.4.2",
+    "rubik-main": "^2.2.0"
   },
   "peerDependencies": {
     "mandrill-api": "^1.0.45",
